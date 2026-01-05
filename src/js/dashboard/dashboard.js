@@ -6,6 +6,54 @@ let CURRENT_TOOL_NAME = null;
 let CURRENT_FILTER = '';
 const toolCache = new Map();
 
+/* --- Theme Management --- */
+const themeToggle = document.getElementById('themeToggle');
+const sunIcon = document.getElementById('sunIcon');
+const moonIcon = document.getElementById('moonIcon');
+const html = document.documentElement;
+
+// Initialize theme from localStorage or system preference
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+    setTheme(theme);
+}
+
+// Set theme
+function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    
+    if (theme === 'dark') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+    } else {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+    }
+}
+
+// Toggle theme
+function toggleTheme() {
+    const currentTheme = html.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+}
+
+// Event listener for theme toggle
+if (themeToggle) {
+    themeToggle.addEventListener('click', toggleTheme);
+}
+
+// Listen for system theme changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+        setTheme(e.matches ? 'dark' : 'light');
+    }
+});
+
 /* --- Auth Module --- */
 const enc = v => btoa(v);
 const dec = v => atob(v);
@@ -31,12 +79,46 @@ async function login() {
     } catch (e) { alert('Invalid Admin Key'); }
 }
 
-function logout() {
+function showLogoutConfirmation() {
+    closeProfileDropdown();
+    document.getElementById('logoutConfirmModal').classList.remove('hidden');
+}
+
+function closeLogoutConfirmation() {
+    document.getElementById('logoutConfirmModal').classList.add('hidden');
+}
+
+function confirmLogout() {
     sessionStorage.clear();
     ADMIN_KEY = null;
+    document.getElementById('logoutConfirmModal').classList.add('hidden');
     document.getElementById('dashboard').classList.add('hidden');
     document.getElementById('authWrapper').classList.remove('hidden');
 }
+
+function logout() {
+    showLogoutConfirmation();
+}
+
+function toggleProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    dropdown.classList.toggle('hidden');
+}
+
+function closeProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    dropdown.classList.add('hidden');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const profileContainer = document.querySelector('.profile-dropdown-container');
+    const profileToggle = document.getElementById('profileToggle');
+    
+    if (profileContainer && !profileContainer.contains(event.target)) {
+        closeProfileDropdown();
+    }
+});
 
 /* --- Tool Logic --- */
 async function fetchToolName(id) {
@@ -50,6 +132,11 @@ async function fetchToolName(id) {
         return name;
     } catch (e) { return 'Fetch Error'; }
 }
+
+const formatRating = (val) => {
+    const n = Number(val);
+    return Number.isNaN(n) ? 'N/A' : n.toFixed(1);
+};
 
 function showTools() {
     setActive('nav-tools');
@@ -65,17 +152,32 @@ function showTools() {
         .then(d => {
             const table = document.getElementById('toolsTable');
             table.innerHTML = '';
+            
+            // Extract unique categories for datalist
+            const categories = new Set();
+            
             d.tools.forEach(t => {
                 toolCache.set(t.id, t.name);
+                if (t.category) categories.add(t.category);
+                
+                const pricingType = t.pricingType || 'PAID';
+                const pricingClass = pricingType.toLowerCase();
                 table.innerHTML += `
                     <tr>
-                        <td>${t.name}</td><td>${t.category}</td><td>${t.pricingType}</td><td>${t.averageRating}</td>
+                        <td>${t.name}</td><td>${t.category}</td><td><span class="pricing-badge ${pricingClass}">${pricingType}</span></td><td>${formatRating(t.averageRating)}</td>
                         <td class="actions">
                             <button class="small" onclick="loadReviews('${t.id}', '${t.name}')">Reviews</button>
                             <button class="small update-btn" onclick="openUpdateModal('${t.id}','${t.name}','${t.useCase}','${t.category}','${t.pricingType}')">Update</button>
                             <button class="small danger" onclick="deleteTool('${t.id}')">Delete</button>
                         </td>
                     </tr>`;
+            });
+            
+            // Populate category datalist
+            const datalist = document.getElementById('categoryList');
+            datalist.innerHTML = '';
+            categories.forEach(cat => {
+                datalist.innerHTML += `<option value="${cat}">`;
             });
         });
 }
@@ -128,10 +230,21 @@ function loadReviews(id, name) {
 }
 
 function renderReviewRow(r, targetTable, type, toolName = '') {
-    const actions = `<div class="actions">
-        <button class="small success" onclick="updateReviewStatus('${r.id}','APPROVED','${type}')">Approve</button>
-        <button class="small danger" onclick="updateReviewStatus('${r.id}','REJECTED','${type}')">Reject</button>
-    </div>`;
+    let actions = '<div class="actions">';
+    const status = (r.status || 'PENDING').toUpperCase();
+    
+    // Show Approve button only if not already approved
+    if (status !== 'APPROVED') {
+        actions += `<button class="small success" onclick="updateReviewStatus('${r.id}','APPROVED','${type}')">Approve</button>`;
+    }
+    
+    // Show Reject button only if not already rejected
+    if (status !== 'REJECTED') {
+        actions += `<button class="small danger" onclick="updateReviewStatus('${r.id}','REJECTED','${type}')">Reject</button>`;
+    }
+    
+    actions += '</div>';
+    
     const toolCell = type === 'global' ? `<td><span class="tool-tag">${toolName}</span></td>` : '';
     targetTable.innerHTML += `<tr>${toolCell}<td>${r.rating}/5</td><td>${r.comment}</td><td>${getStatusPill(r.status)}</td><td>${actions}</td></tr>`;
 }
@@ -185,16 +298,38 @@ async function updateTool() {
     closeUpdateModal(); showTools();
 }
 
-async function deleteTool(id) {
-    if (!confirm('Delete tool?')) return;
-    await fetch(`${API}/admin/tools/${id}`, { method: 'DELETE', headers: { 'X-ADMIN-KEY': ADMIN_KEY } });
-    showTools();
+let CURRENT_DELETE_TOOL = null;
+function showDeleteConfirmation(id) {
+    CURRENT_DELETE_TOOL = id;
+    document.getElementById('deleteConfirmModal').classList.remove('hidden');
+}
+
+function closeDeleteConfirmation() {
+    document.getElementById('deleteConfirmModal').classList.add('hidden');
+    CURRENT_DELETE_TOOL = null;
+}
+
+async function confirmDelete() {
+    if (CURRENT_DELETE_TOOL) {
+        await fetch(`${API}/admin/tools/${CURRENT_DELETE_TOOL}`, { method: 'DELETE', headers: { 'X-ADMIN-KEY': ADMIN_KEY } });
+        closeDeleteConfirmation();
+        showTools();
+    }
+}
+
+function deleteTool(id) {
+    showDeleteConfirmation(id);
 }
 
 /* --- Init --- */
 function init() {
     document.getElementById('authWrapper').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
+    initTheme();
     showTools();
 }
-window.onload = () => { if (loadKey()) init(); else document.getElementById('authWrapper').classList.remove('hidden'); };
+window.onload = () => { 
+    initTheme(); 
+    if (loadKey()) init(); 
+    else document.getElementById('authWrapper').classList.remove('hidden'); 
+};

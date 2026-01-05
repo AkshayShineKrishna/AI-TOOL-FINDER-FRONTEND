@@ -23,13 +23,50 @@
 
     <div id="dashboard" class="dashboard hidden">
         <nav class="navbar">
-            <div class="nav-brand">AI-TOOL-FINDER ADMIN DASHBOARD</div>
-            <button class="small danger" onclick="logout()">Logout</button>
+            <div class="nav-brand">
+                <span class="brand-main">AI TOOL FINDER</span>
+                <span class="brand-sub">admin dashboard</span>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                    <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px;">
+                        <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"/>
+                    </svg>
+                    <svg id="moonIcon" style="display: none; width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+                <div class="profile-dropdown-container">
+                    <button class="profile-icon" id="profileToggle" aria-label="Profile menu" onclick="toggleProfileDropdown()">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px;">
+                            <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                    <div class="profile-dropdown hidden" id="profileDropdown">
+                        <div class="dropdown-item" onclick="showLogoutConfirmation()">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 16px; height: 16px;">
+                                <path fill-rule="evenodd" d="M7.5 3.75A1.5 1.5 0 006 5.25v13.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5V15a.75.75 0 011.5 0v3.75a3 3 0 01-3 3h-6a3 3 0 01-3-3V5.25a3 3 0 013-3h6a3 3 0 013 3V9A.75.75 0 0115 9V5.25a1.5 1.5 0 00-1.5-1.5h-6zm10.72 4.72a.75.75 0 011.06 0l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.72-1.72H9a.75.75 0 010-1.5h10.94l-1.72-1.72a.75.75 0 010-1.06z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Logout</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </nav>
 
         <aside class="sidebar">
-            <button id="nav-tools" class="nav-btn" onclick="showTools()">🛠 Tools Management</button>
-            <button id="nav-reviews" class="nav-btn" onclick="showReviews()">📝 Review Moderation</button>
+            <button id="nav-tools" class="nav-btn" onclick="showTools()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 18px; height: 18px;">
+                    <path fill-rule="evenodd" d="M12 6.75a5.25 5.25 0 016.775-5.025.75.75 0 01.313 1.248l-3.32 3.319c.063.475.276.934.641 1.299.365.365.824.578 1.3.64l3.318-3.319a.75.75 0 011.248.313 5.25 5.25 0 01-5.472 6.756c-1.018-.086-1.87.1-2.309.634L7.344 21.3A3.298 3.298 0 112.7 16.657l8.684-7.151c.533-.44.72-1.291.634-2.309A5.342 5.342 0 0112 6.75zM4.117 19.125a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75h-.008a.75.75 0 01-.75-.75v-.008z" clip-rule="evenodd"/>
+                </svg>
+                Tools Management
+            </button>
+            <button id="nav-reviews" class="nav-btn" onclick="showReviews()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 18px; height: 18px;">
+                    <path fill-rule="evenodd" d="M2.625 6.75a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875 0A.75.75 0 018.25 6h12a.75.75 0 010 1.5h-12a.75.75 0 01-.75-.75zM2.625 12a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zM7.5 12a.75.75 0 01.75-.75h12a.75.75 0 010 1.5h-12A.75.75 0 017.5 12zm-4.875 5.25a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875 0a.75.75 0 01.75-.75h12a.75.75 0 010 1.5h-12a.75.75 0 01-.75-.75z" clip-rule="evenodd"/>
+                </svg>
+                Review Moderation
+            </button>
         </aside>
 
         <main class="content">
@@ -84,9 +121,14 @@
     <div id="toolModal" class="modal-overlay hidden">
         <div class="card modal-content">
             <h3>Add New Tool</h3>
-            <input id="toolName" placeholder="Tool Name">
-            <input id="toolUseCase" placeholder="Use Case">
-            <input id="toolCategory" placeholder="Category">
+            <label for="toolName">Tool Name</label>
+            <input id="toolName" placeholder="Enter tool name">
+            <label for="toolUseCase">Use Case</label>
+            <input id="toolUseCase" placeholder="Describe the use case">
+            <label for="toolCategory">Category</label>
+            <input id="toolCategory" list="categoryList" placeholder="e.g., AI Assistant, Image Generator">
+            <datalist id="categoryList"></datalist>
+            <label for="toolPricing">Pricing Type</label>
             <select id="toolPricing">
                 <option value="FREE">FREE</option>
                 <option value="PAID">PAID</option>
@@ -102,9 +144,13 @@
     <div id="updateToolModal" class="modal-overlay hidden">
         <div class="card modal-content">
             <h3>Update Tool</h3>
-            <input id="updateToolName" placeholder="Tool Name">
-            <input id="updateToolUseCase" placeholder="Use Case">
-            <input id="updateToolCategory" placeholder="Category">
+            <label for="updateToolName">Tool Name</label>
+            <input id="updateToolName" placeholder="Enter tool name">
+            <label for="updateToolUseCase">Use Case</label>
+            <input id="updateToolUseCase" placeholder="Describe the use case">
+            <label for="updateToolCategory">Category</label>
+            <input id="updateToolCategory" list="categoryList" placeholder="e.g., AI Assistant, Image Generator">
+            <label for="updateToolPricing">Pricing Type</label>
             <select id="updateToolPricing">
                 <option value="FREE">FREE</option>
                 <option value="PAID">PAID</option>
@@ -113,6 +159,38 @@
             <div class="modal-actions">
                 <button class="secondary" onclick="closeUpdateModal()">Cancel</button>
                 <button class="update-btn" onclick="updateTool()">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="logoutConfirmModal" class="modal-overlay hidden">
+        <div class="card modal-content logout-confirm">
+            <div class="logout-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M7.5 3.75A1.5 1.5 0 006 5.25v13.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5V15a.75.75 0 011.5 0v3.75a3 3 0 01-3 3h-6a3 3 0 01-3-3V5.25a3 3 0 013-3h6a3 3 0 013 3V9A.75.75 0 0115 9V5.25a1.5 1.5 0 00-1.5-1.5h-6zm10.72 4.72a.75.75 0 011.06 0l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.72-1.72H9a.75.75 0 010-1.5h10.94l-1.72-1.72a.75.75 0 010-1.06z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <h3>Confirm Logout</h3>
+            <p style="color: var(--muted); text-align: center; margin: 12px 0 24px;">Are you sure you want to logout from the admin dashboard?</p>
+            <div class="modal-actions">
+                <button class="secondary" onclick="closeLogoutConfirmation()">Cancel</button>
+                <button class="danger" onclick="confirmLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteConfirmModal" class="modal-overlay hidden">
+        <div class="card modal-content logout-confirm">
+            <div class="logout-icon" style="background: rgba(239, 68, 68, 0.1);">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="color: var(--danger);">
+                    <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <h3>Confirm Delete</h3>
+            <p style="color: var(--muted); text-align: center; margin: 12px 0 24px;">Are you sure you want to delete this tool? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="secondary" onclick="closeDeleteConfirmation()">Cancel</button>
+                <button class="danger" onclick="confirmDelete()">Delete</button>
             </div>
         </div>
     </div>
